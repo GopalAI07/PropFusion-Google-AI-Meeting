@@ -1,0 +1,51 @@
+# =============================================
+# Backend (FastAPI) - .gitignore
+# =============================================
+
+# ----- Environment variables -----
+.env
+.env.local
+.env.example
+.env.production
+
+# ----- Python -----
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# ----- Virtual environments -----
+myvenv/
+venv/
+env/
+ENV/
+.venv/
+
+# ----- Distribution / packaging -----
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# ----- Testing / coverage -----
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+
+# ----- Type checkers -----
+.mypy_cache/
+.ruff_cache/
+
+# ----- Uploaded/generated runtime files -----
+uploads/*
+!uploads/.gitkeep
+
+# ----- Database -----
+*.db
+*.sqlite3
+
+# ----- Editor -----
+.vscode/
+.idea/
