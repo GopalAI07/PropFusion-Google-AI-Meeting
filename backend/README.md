@@ -1,6 +1,6 @@
 # AI Meeting Hub — Backend
 
-FastAPI backend powering the AI Meeting Hub: authentication, meeting management, real-time transcription over WebSockets, and AI-generated summaries via Google Gemini.
+FastAPI backend powering the AI Meeting Hub: authentication, meeting management, live meeting rooms (WebRTC signaling over WebSockets), and AI-generated summaries via Google Gemini.
 
 **Live API:** https://propfusion-google-ai-meeting.onrender.com
 
@@ -11,7 +11,7 @@ FastAPI backend powering the AI Meeting Hub: authentication, meeting management,
 - **Pydantic / pydantic-settings** — request validation and config management
 - **python-jose** + **bcrypt** — JWT auth and password hashing
 - **google-genai** — Gemini AI integration for summarization
-- **WebSockets** — real-time meeting/transcript updates
+- **WebSockets** — meeting signaling (WebRTC offer/answer/ICE relay, participant state, host moderation)
 - **Jinja2** — email templating
 
 ## Project Structure
@@ -19,13 +19,13 @@ FastAPI backend powering the AI Meeting Hub: authentication, meeting management,
 ```
 backend/
 ├── app/
-│   ├── api/            # Route handlers (auth, meeting, transcript, summary, websocket)
+│   ├── api/            # Route handlers (auth, meeting, summary, websocket)
 │   ├── config/         # Settings (env-driven)
 │   ├── database/       # SQLAlchemy models + session setup (with local-DB fallback)
 │   ├── midlleware/      # Logging, rate limiting, process time, security headers
 │   ├── prompts/         # Gemini prompt templates
 │   ├── schemas/         # Pydantic request/response schemas
-│   ├── services/        # Business logic (auth, meeting, AI, email, export, transcript)
+│   ├── services/        # Business logic (auth, meeting, AI, email, export)
 │   ├── utils/            # Shared helpers
 │   ├── websocket/        # Connection manager
 │   ├── workers/           # Background tasks
@@ -90,9 +90,8 @@ This backend runs as a Render Web Service. Two things Render needs that aren't a
 |---|---|---|
 | Auth | `/api/auth` | Register, login, refresh, profile |
 | Meeting | `/api/meetings` | Create/join/manage meetings |
-| Transcript | `/api/transcripts` | Meeting transcript retrieval |
 | Summary | `/api/summary` | AI-generated meeting summaries |
-| WebSocket | `/ws` | Real-time meeting/transcript events |
+| WebSocket | `/ws` | Meeting room signaling (WebRTC, participant state, host moderation) |
 
 ## Notes
 

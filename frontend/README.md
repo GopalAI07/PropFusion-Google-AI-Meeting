@@ -11,7 +11,7 @@ React + Vite frontend for the AI Meeting Hub: authentication, meeting creation/j
 - **React Router v7** — routing
 - **Tailwind CSS v4** — styling
 - **Axios** — HTTP client
-- **Socket.io-client** — real-time meeting/transcript updates
+- **Socket.io-client** — listed as a dependency; the app's actual meeting-room signaling uses the browser's native WebSocket API directly (see `src/hooks/useMeetingRoom.js`), not this library
 - **Recharts** — dashboard charts
 - **React Hot Toast** — notifications
 - **Lucide React** — icons
@@ -27,10 +27,10 @@ frontend/
 │   ├── hooks/            # useMeetings, useMeetingRoom (WebSocket signaling + WebRTC)
 │   ├── pages/             # Route-level pages (Dashboard, Login, Register, Meetings...)
 │   ├── redux/               # Store + slices
-│   ├── routes/                # Route definitions
+│   ├── routes/                # (currently empty — routing is handled inline in App.jsx)
 │   ├── styles/                 # Global styles (Tailwind entry)
 │   ├── utils/                   # Shared helpers
-│   ├── websocket/                # WebSocket client setup
+│   ├── websocket/                # (currently empty — meeting-room WebSocket logic lives in hooks/useMeetingRoom.js)
 │   ├── App.jsx
 │   └── main.jsx
 ├── public/

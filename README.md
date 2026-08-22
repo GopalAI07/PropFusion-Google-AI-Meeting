@@ -1,6 +1,6 @@
 # AI Meeting Hub
 
-An AI-powered meeting hub: create/join meetings, get live transcripts over WebSockets, and receive AI-generated summaries powered by Google Gemini.
+An AI-powered meeting hub: create/join meetings, host live video meeting rooms over WebRTC, and receive AI-generated summaries powered by Google Gemini.
 
 ## Live
 
@@ -26,9 +26,8 @@ https://github.com/user-attachments/assets/241c165e-e8cf-4f45-a11a-18051c089917
 ## Features
 
 - Email/password authentication with JWT access + refresh tokens
-- Create and join meetings, with live meeting rooms
-- Real-time transcription and updates over WebSockets
-- AI-generated meeting summaries via Google Gemini
+- Create and join meetings, with live video meeting rooms over WebRTC (WebSocket signaling, host moderation)
+- Session audio is recorded, uploaded, and summarized into AI-generated meeting summaries via Google Gemini
 - Rate limiting, security headers, and structured logging on the API
 
 ## Quick Start (local)
