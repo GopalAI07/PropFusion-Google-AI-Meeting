@@ -2,6 +2,8 @@
 
 React + Vite frontend for the AI Meeting Hub: authentication, meeting creation/joining, live meeting rooms, and AI-powered summaries.
 
+**Live app:** https://google-ai-meeting.vercel.app/
+
 ## Tech Stack
 
 - **React 18** + **Vite** — UI and build tooling
@@ -22,7 +24,7 @@ frontend/
 │   ├── api/            # Axios instance / API config
 │   ├── components/     # Reusable UI components (Navbar, Sidebar, modals, forms...)
 │   ├── context/         # AuthContext (auth state/session)
-│   ├── hooks/            # useMeetings, useMeetingRoom
+│   ├── hooks/            # useMeetings, useMeetingRoom (WebSocket signaling + WebRTC)
 │   ├── pages/             # Route-level pages (Dashboard, Login, Register, Meetings...)
 │   ├── redux/               # Store + slices
 │   ├── routes/                # Route definitions
@@ -33,22 +35,27 @@ frontend/
 │   └── main.jsx
 ├── public/
 ├── index.html
-├── vite.config.js
+├── vite.config.js       # dev proxy for /api, /ws, /uploads → localhost:8000
 └── package.json
 ```
 
-## Setup
+## Local Setup
 
 1. **Install dependencies**
    ```bash
    npm install
    ```
 
-2. **Configure environment variables** (optional — defaults to `/api` if unset)
+2. **Configure environment variables**
    ```bash
    cp .env.example .env
    ```
-   Update it to point at your running backend, e.g. `VITE_API_BASE_URL=http://localhost:8000/api`.
+   For local dev, point it at your local backend:
+   ```
+   VITE_API_BASE_URL=http://localhost:8000/api
+   VITE_WS_BASE_URL=ws://localhost:8000
+   ```
+   `VITE_WS_BASE_URL` can actually be left unset for local dev — it falls back to same-origin, which works through the Vite dev server proxy in `vite.config.js`.
 
 3. **Run the dev server**
    ```bash
@@ -67,7 +74,18 @@ frontend/
    npm run preview
    ```
 
+## Deploying (Vercel)
+
+Vercel runs `npm run build` (Vite's default mode is `production`), so it needs the backend's *deployed* URL, not localhost. Since `.env`/`.env.production` files are gitignored and never pushed, set these directly in the Vercel dashboard (Project → Settings → Environment Variables):
+
+```
+VITE_API_BASE_URL=https://propfusion-google-ai-meeting.onrender.com/api
+VITE_WS_BASE_URL=wss://propfusion-google-ai-meeting.onrender.com
+```
+
+`VITE_WS_BASE_URL` is required in production (unlike local dev) because the frontend (Vercel) and backend (Render) are on different hosts — there's no same-origin to fall back to.
+
 ## Notes
 
-- Make sure the backend (see `../backend/README.md`) is running before starting the frontend, since auth, meetings, and AI summaries all depend on it.
+- Make sure the backend (see `../backend/README.md`) is running — locally or on Render — before starting the frontend, since auth, meetings, and AI summaries all depend on it.
 - `node_modules/` and `dist/` are intentionally gitignored — never commit them.
