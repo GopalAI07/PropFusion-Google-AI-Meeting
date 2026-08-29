@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <defs>
+    <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#06b6d4" />
+      <stop offset="100%" stop-color="#8b5cf6" />
+    </linearGradient>
+  </defs>
+  <rect width="100" height="100" rx="24" fill="#061a1e"/>
+  <rect x="2" y="2" width="96" height="96" rx="22" fill="none" stroke="url(#grad)" stroke-width="4"/>
+  <!-- Video camera / AI hub icon -->
+  <rect x="22" y="32" width="38" height="36" rx="8" fill="url(#grad)" />
+  <polygon points="62,42 78,32 78,68 62,58" fill="url(#grad)" />
+  <!-- Sparkle / AI dot -->
+  <circle cx="34" cy="44" r="4" fill="#ffffff" />
+  <circle cx="48" cy="56" r="3" fill="#ffffff" opacity="0.8" />
+</svg>
