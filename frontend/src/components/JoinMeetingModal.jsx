@@ -61,7 +61,6 @@ export default function JoinMeetingModal({ isOpen, onClose }) {
       setLoading(true);
       setError(null);
 
-      // Meeting codes look like "abc-defg-hij"; meeting IDs are UUIDs. Try ID first, fall back to code.
       let meetingId = targetInput;
       try {
         const res = await MEETING_API.getJoinInfo(targetInput);
@@ -91,14 +90,12 @@ export default function JoinMeetingModal({ isOpen, onClose }) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-md transition-opacity">
-      {/* Ambient glowing circles */}
       <div className="absolute w-96 h-96 bg-emerald-500/20 rounded-full blur-3xl pointer-events-none animate-pulse-glow" />
 
       <div
         className="relative w-full max-w-xl bg-white rounded-3xl shadow-2xl border border-emerald-200 overflow-hidden animate-modal-pop z-10 text-gray-900"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Header styling in light green theme */}
         <div className="flex items-center justify-between px-6 py-5 border-b border-emerald-200 bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 text-white relative overflow-hidden">
           <div className="flex items-center gap-3.5 relative z-10">
             <div className="p-3 bg-white/15 backdrop-blur-md rounded-2xl ring-1 ring-white/30 shadow-lg">
@@ -122,7 +119,6 @@ export default function JoinMeetingModal({ isOpen, onClose }) {
           </button>
         </div>
 
-        {/* Modal Form */}
         <div className="p-6 space-y-6 bg-emerald-50/30">
           <form onSubmit={handleJoin} className="space-y-4">
             {error && (
@@ -188,7 +184,6 @@ export default function JoinMeetingModal({ isOpen, onClose }) {
             </div>
           </form>
 
-          {/* Quick Join List */}
           <div className="pt-5 border-t border-emerald-200">
             <h3 className="text-xs font-extrabold uppercase tracking-wider text-black mb-3 flex items-center gap-1.5">
               <Calendar className="w-3.5 h-3.5 text-emerald-600" />

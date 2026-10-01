@@ -37,8 +37,6 @@ export default function Navbar({ onMenuClick }) {
       }}
     >
       <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-between">
-
-        {/* Left: Hamburger + Brand */}
         <div className="flex items-center gap-4">
           <button
             onClick={handleSidebarToggle}
@@ -49,13 +47,11 @@ export default function Navbar({ onMenuClick }) {
           </button>
 
           <Link to="/dashboard" className="group flex items-center gap-3">
-            {/* Logo icon */}
             <div className="relative flex items-center justify-center w-10 h-10 rounded-2xl shadow-lg group-hover:scale-105 transition-transform duration-300"
               style={{ background: 'linear-gradient(135deg, #059669, #0891b2, #2563eb)' }}>
               <Video className="w-5 h-5 text-white" />
               <div className="absolute -top-0.5 -right-0.5 w-3 h-3 bg-emerald-400 rounded-full ring-2 ring-indigo-900 animate-pulse" />
             </div>
-            {/* Brand text */}
             <div className="flex flex-col">
               <span className="font-black text-lg text-white leading-tight tracking-tight">
                 AI{' '}
@@ -73,13 +69,11 @@ export default function Navbar({ onMenuClick }) {
           </Link>
         </div>
 
-        {/* Right: User profile */}
         <div className="relative" ref={dropdownRef}>
           <button
             onClick={() => setDropdownOpen(!dropdownOpen)}
             className="flex items-center gap-2.5 px-3 py-1.5 rounded-2xl border border-white/20 bg-white/10 hover:bg-white/20 backdrop-blur transition-all duration-200 group"
           >
-            {/* Avatar */}
             <div
               className="w-8 h-8 rounded-xl flex items-center justify-center text-white text-xs font-black shadow-md ring-2 ring-white/20"
               style={{ backgroundColor: stringToColor(user?.email || 'User') }}
@@ -99,13 +93,11 @@ export default function Navbar({ onMenuClick }) {
             />
           </button>
 
-          {/* Dropdown */}
           {dropdownOpen && (
             <div
               className="absolute right-0 mt-2 w-64 rounded-3xl overflow-hidden shadow-2xl border border-indigo-200/20 animate-modal-pop z-50"
               style={{ background: 'linear-gradient(160deg,#1e1b4b,#312e81)' }}
             >
-              {/* Profile header inside dropdown */}
               <div className="px-5 py-4 relative overflow-hidden border-b border-white/10">
                 <div className="absolute -top-4 -right-4 w-20 h-20 bg-purple-400/20 rounded-full blur-xl pointer-events-none" />
                 <div className="flex items-center gap-3 relative z-10">
@@ -130,7 +122,6 @@ export default function Navbar({ onMenuClick }) {
                 </div>
               </div>
 
-              {/* Sign Out */}
               <div className="p-3">
                 <button
                   onClick={() => { setDropdownOpen(false); logout(); }}

@@ -26,10 +26,6 @@ class AIService:
 
         self.model_name = settings.GEMINI_MODEL
 
-    # ----------------------------------------------------------
-    # Gemini configuration
-    # ----------------------------------------------------------
-
     def _config(self, json_mode: bool = False):
 
         return types.GenerateContentConfig(
@@ -42,10 +38,6 @@ class AIService:
             ),
         )
 
-    # ----------------------------------------------------------
-    # Generate content
-    # ----------------------------------------------------------
-
     def _generate(
         self,
         prompt: str,
@@ -57,10 +49,6 @@ class AIService:
             contents=prompt,
             config=self._config(json_mode),
         )
-
-    # ----------------------------------------------------------
-    # Clean JSON
-    # ----------------------------------------------------------
 
     def _clean_json_response(
         self,
@@ -99,32 +87,24 @@ class AIService:
 
         if object_start == -1:
             start = array_start
-            closing = "]"
-
+            end = text.rfind("]")
         elif array_start == -1:
             start = object_start
-            closing = "}"
-
-        elif object_start < array_start:
-            start = object_start
-            closing = "}"
-
+            end = text.rfind("}")
         else:
-            start = array_start
-            closing = "]"
+            if object_start < array_start:
+                start = object_start
+                end = text.rfind("}")
+            else:
+                start = array_start
+                end = text.rfind("]")
 
-        end = text.rfind(closing)
-
-        if end == -1:
+        if end == -1 or end < start:
             raise ValueError(
                 "Invalid JSON response"
             )
 
         return text[start:end + 1]
-
-    # ----------------------------------------------------------
-    # Meeting summary
-    # ----------------------------------------------------------
 
     def generate_summary(
         self,
@@ -167,10 +147,6 @@ class AIService:
                     f"{str(e)}"
                 ),
             )
-
-    # ----------------------------------------------------------
-    # Long transcript summary
-    # ----------------------------------------------------------
 
     def generate_summary_long(
         self,
@@ -256,10 +232,6 @@ class AIService:
                 ),
             )
 
-    # ----------------------------------------------------------
-    # Sentiment
-    # ----------------------------------------------------------
-
     def analyze_sentiment(
         self,
         text: str,
@@ -292,10 +264,6 @@ class AIService:
                 "key_emotions": [],
                 "error": str(e),
             }
-
-    # ----------------------------------------------------------
-    # Action items
-    # ----------------------------------------------------------
 
     def extract_action_items(
         self,
@@ -335,10 +303,6 @@ class AIService:
                     "error": str(e),
                 }
             ]
-
-    # ----------------------------------------------------------
-    # Meeting title
-    # ----------------------------------------------------------
 
     def generate_meeting_title(
         self,
@@ -400,10 +364,6 @@ Title:
             time.sleep(1)
 
         raise TimeoutError(f"Gemini audio file {file_name} did not become ACTIVE within {max_wait_seconds} seconds")
-
-    # ----------------------------------------------------------
-    # Audio-to-Summary generation
-    # ----------------------------------------------------------
 
     def generate_summary_from_audio(
         self,

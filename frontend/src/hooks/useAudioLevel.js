@@ -1,11 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
 
-/**
- * Measures the live volume of a MediaStream's audio track using the Web
- * Audio API, so the UI can show a small "speaking" waveform for whoever is
- * currently talking. Returns a normalized level between 0 (silence) and 1
- * (loud), updated continuously via requestAnimationFrame.
- */
 export default function useAudioLevel(stream) {
   const [level, setLevel] = useState(0);
   const rafRef = useRef(null);
@@ -57,7 +51,6 @@ export default function useAudioLevel(stream) {
         source.disconnect();
         analyser.disconnect();
       } catch (err) {
-        // ignore
       }
       audioCtx.close().catch(() => {});
     };

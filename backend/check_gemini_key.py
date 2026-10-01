@@ -12,7 +12,6 @@ the same way the app does, and makes one small text-generation call.
 import os
 import sys
 
-# Load .env the same way the app does (python-dotenv is already a dependency)
 try:
     from dotenv import load_dotenv
     load_dotenv()

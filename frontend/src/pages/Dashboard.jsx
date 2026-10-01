@@ -11,8 +11,6 @@ export default function Dashboard() {
 
   return (
     <div className="relative min-h-[calc(100vh-4rem)] overflow-hidden">
-
-      {/* ─── Full-page gradient background ─── */}
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
@@ -20,15 +18,11 @@ export default function Dashboard() {
         }}
       />
 
-      {/* Ambient orbs */}
       <div className="absolute top-10 left-10 w-72 h-72 bg-indigo-600/20 rounded-full blur-3xl pointer-events-none animate-pulse" />
       <div className="absolute top-32 right-16 w-80 h-80 bg-purple-600/15 rounded-full blur-3xl pointer-events-none" />
       <div className="absolute bottom-10 left-1/3 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
 
-      {/* ─── Content ─── */}
       <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 py-10 space-y-10">
-
-        {/* Hero Banner */}
         <div
           className="relative overflow-hidden rounded-3xl p-8 sm:p-10 shadow-2xl border border-white/10"
           style={{
@@ -36,7 +30,6 @@ export default function Dashboard() {
             backdropFilter: 'blur(16px)',
           }}
         >
-          {/* Decorative circles */}
           <div className="absolute -top-12 -right-12 w-64 h-64 rounded-full bg-white/5 blur-2xl pointer-events-none" />
           <div className="absolute -bottom-10 -left-10 w-48 h-48 rounded-full bg-indigo-400/10 blur-xl pointer-events-none" />
           <div className="absolute top-4 right-4 opacity-10">
@@ -44,7 +37,6 @@ export default function Dashboard() {
           </div>
 
           <div className="relative z-10">
-            {/* Badge */}
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 border border-white/20 text-xs font-bold text-amber-300 uppercase tracking-wider mb-5">
               <Zap className="w-3.5 h-3.5 text-amber-300 fill-amber-300" />
               AI Assisted Workspace
@@ -67,7 +59,6 @@ export default function Dashboard() {
               Collaborate smarter with instant video room generation and automated AI meeting summaries.
             </p>
 
-            {/* Stats row */}
             <div className="mt-6 flex flex-wrap gap-4">
               {[
                 { label: 'AI Powered', value: '100%' },
@@ -83,10 +74,7 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* ─── Action Cards ─── */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-
-          {/* Create Meeting Card */}
           <div
             onClick={() => setIsCreateOpen(true)}
             className="group relative cursor-pointer overflow-hidden rounded-3xl p-8 border border-white/10 hover:border-indigo-400/40 shadow-xl hover:shadow-indigo-500/20 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2"
@@ -132,7 +120,6 @@ export default function Dashboard() {
             </div>
           </div>
 
-          {/* Join Meeting Card */}
           <div
             onClick={() => setIsJoinOpen(true)}
             className="group relative cursor-pointer overflow-hidden rounded-3xl p-8 border border-white/10 hover:border-emerald-400/40 shadow-xl hover:shadow-emerald-500/20 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2"
@@ -180,7 +167,6 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* Modals */}
       <CreateMeetingModal isOpen={isCreateOpen} onClose={() => setIsCreateOpen(false)} />
       <JoinMeetingModal isOpen={isJoinOpen} onClose={() => setIsJoinOpen(false)} />
     </div>

@@ -10,19 +10,10 @@ logger = logging.getLogger(__name__)
 
 
 class ConnectionManager:
-    """
-    WebSocket connection manager for managing real-time connections.
-    Supports rooms for meeting-specific broadcasting.
-    """
-
     def __init__(self):
-        # active_connections: {room_id: {user_id: WebSocket}}
         self.active_connections: Dict[str, Dict[str, WebSocket]] = {}
-        # user_rooms: {user_id: set(room_ids)}
         self.user_rooms: Dict[str, Set[str]] = {}
-        # room_hosts: {room_id: user_id} — who is allowed to moderate this room
         self.room_hosts: Dict[str, str] = {}
-        # blocked_users: {room_id: set(user_id)} — removed by the host, cannot rejoin
         self.blocked_users: Dict[str, Set[str]] = {}
         self.total_connections = 0
 
@@ -30,22 +21,17 @@ class ConnectionManager:
         return user_id in self.blocked_users.get(room_id, set())
 
     async def connect(self, websocket: WebSocket, room_id: str, user_id: str, is_host: bool = False) -> bool:
-        """Accept a new WebSocket connection and join a room. Returns False if rejected."""
-        # Check max connections
         if self.total_connections >= settings.WS_MAX_CONNECTIONS:
             await websocket.close(code=1008, reason="Maximum connections reached")
             return False
 
         await websocket.accept()
 
-        # Initialize room if not exists
         if room_id not in self.active_connections:
             self.active_connections[room_id] = {}
 
-        # Add connection to room
         self.active_connections[room_id][user_id] = websocket
 
-        # Track user rooms
         if user_id not in self.user_rooms:
             self.user_rooms[user_id] = set()
         self.user_rooms[user_id].add(room_id)
@@ -55,7 +41,6 @@ class ConnectionManager:
 
         self.total_connections += 1
 
-        # Notify room about new user
         await self.broadcast_to_room(
             room_id,
             {
@@ -70,7 +55,6 @@ class ConnectionManager:
         return True
 
     async def disconnect(self, websocket: WebSocket, room_id: str, user_id: str):
-        """Remove a WebSocket connection."""
         if room_id in self.active_connections and user_id in self.active_connections[room_id]:
             del self.active_connections[room_id][user_id]
             if not self.active_connections[room_id]:
@@ -78,7 +62,6 @@ class ConnectionManager:
 
             self.total_connections -= 1
 
-        # Cleanup user rooms
         if user_id in self.user_rooms and room_id in self.user_rooms[user_id]:
             self.user_rooms[user_id].discard(room_id)
             if not self.user_rooms[user_id]:
@@ -87,7 +70,6 @@ class ConnectionManager:
         if self.room_hosts.get(room_id) == user_id:
             del self.room_hosts[room_id]
 
-        # Notify room about user leaving
         await self.broadcast_to_room(
             room_id,
             {
@@ -171,7 +153,6 @@ class ConnectionManager:
         message_type = data.get("type", "unknown")
 
         if message_type in ("webrtc_offer", "webrtc_answer", "webrtc_ice_candidate"):
-            # Relay WebRTC signaling data directly to the intended peer
             target_user_id = data.get("data", {}).get("target_user_id")
             if target_user_id:
                 await self.send_personal_message(
@@ -206,7 +187,6 @@ class ConnectionManager:
             )
 
         elif message_type == "meeting_action":
-            # Handle meeting actions (start, pause, resume, end)
             action = data.get("data", {}).get("action")
             await self.broadcast_meeting_update(room_id, {
                 "user_id": user_id,
@@ -215,7 +195,6 @@ class ConnectionManager:
             })
 
         elif message_type == "typing":
-            # Indicate that a user is typing
             await self.broadcast_to_room(
                 room_id,
                 {
@@ -227,8 +206,6 @@ class ConnectionManager:
             )
 
         elif message_type == "participant_state":
-            # A participant's mic/camera state changed — let everyone else know
-            # so their UI can show the correct icons.
             await self.broadcast_to_room(
                 room_id,
                 {
@@ -243,8 +220,6 @@ class ConnectionManager:
             )
 
         elif message_type == "host_moderate":
-            # Host-only: mute/unmute a participant's mic or camera, or remove
-            # them from the meeting entirely.
             if self.room_hosts.get(room_id) != user_id:
                 await self.send_personal_message(
                     {
@@ -284,7 +259,6 @@ class ConnectionManager:
                 except Exception:
                     pass
             else:
-                # mute_mic | unmute_mic | mute_camera | unmute_camera
                 await self.send_personal_message(
                     {
                         "type": "moderation",
@@ -296,7 +270,6 @@ class ConnectionManager:
                 )
 
         else:
-            # Unknown message type, send error back
             await self.send_personal_message(
                 {
                     "type": "error",
@@ -308,6 +281,5 @@ class ConnectionManager:
             )
 
 
-# Singleton instance
 manager = ConnectionManager()
 

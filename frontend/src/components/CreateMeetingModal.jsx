@@ -59,7 +59,6 @@ export default function CreateMeetingModal({ isOpen, onClose, onSuccess }) {
       };
 
       const res = await MEETING_API.create(payload);
-      // Backend wraps the created meeting as { success, message, data: { meeting } }
       const createdMeeting = res.data?.data?.meeting || res.data?.meeting || res.data;
 
       if (onSuccess) {
@@ -85,14 +84,12 @@ export default function CreateMeetingModal({ isOpen, onClose, onSuccess }) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-md transition-opacity">
-      {/* Background ambient glow effect */}
       <div className="absolute w-96 h-96 bg-indigo-500/20 rounded-full blur-3xl pointer-events-none animate-pulse-glow" />
 
       <div
         className="relative w-full max-w-xl bg-white rounded-3xl shadow-2xl border border-gray-200 overflow-hidden animate-modal-pop z-10 text-gray-900"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Header styling */}
         <div className="flex items-center justify-between px-6 py-5 border-b border-gray-200 bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-700 text-white relative overflow-hidden">
           <div className="flex items-center gap-3.5 relative z-10">
             <div className="p-3 bg-white/15 backdrop-blur-md rounded-2xl ring-1 ring-white/30 shadow-lg">
@@ -116,7 +113,6 @@ export default function CreateMeetingModal({ isOpen, onClose, onSuccess }) {
           </button>
         </div>
 
-        {/* Form Body - Solid Black Text without dark:text-white */}
         <form onSubmit={handleSubmit} className="p-6 space-y-4 max-h-[80vh] overflow-y-auto bg-white text-gray-900">
           {error && (
             <div className="p-3.5 text-sm font-semibold rounded-2xl bg-red-50 text-red-700 border border-red-200 flex items-center gap-2">
@@ -125,7 +121,6 @@ export default function CreateMeetingModal({ isOpen, onClose, onSuccess }) {
             </div>
           )}
 
-          {/* Meeting Title */}
           <div>
             <label className="block text-xs font-extrabold uppercase tracking-wider text-black mb-1.5 flex items-center gap-1.5">
               <Video className="w-3.5 h-3.5 text-indigo-600" />
@@ -142,7 +137,6 @@ export default function CreateMeetingModal({ isOpen, onClose, onSuccess }) {
             />
           </div>
 
-          {/* Description & Agenda */}
           <div>
             <label className="block text-xs font-extrabold uppercase tracking-wider text-black mb-1.5 flex items-center gap-1.5">
               <FileText className="w-3.5 h-3.5 text-indigo-600" />
@@ -158,9 +152,7 @@ export default function CreateMeetingModal({ isOpen, onClose, onSuccess }) {
             />
           </div>
 
-          {/* Separated Date, Time, and Duration */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-            {/* 1. Date */}
             <div>
               <label className="block text-xs font-extrabold uppercase tracking-wider text-black mb-1.5 flex items-center gap-1">
                 <Calendar className="w-3.5 h-3.5 text-indigo-600" />
@@ -175,7 +167,6 @@ export default function CreateMeetingModal({ isOpen, onClose, onSuccess }) {
               />
             </div>
 
-            {/* 2. Time */}
             <div>
               <label className="block text-xs font-extrabold uppercase tracking-wider text-black mb-1.5 flex items-center gap-1">
                 <Clock className="w-3.5 h-3.5 text-indigo-600" />
@@ -190,7 +181,6 @@ export default function CreateMeetingModal({ isOpen, onClose, onSuccess }) {
               />
             </div>
 
-            {/* 3. Duration */}
             <div>
               <label className="block text-xs font-extrabold uppercase tracking-wider text-black mb-1.5 flex items-center gap-1">
                 <Clock className="w-3.5 h-3.5 text-indigo-600" />
@@ -212,7 +202,6 @@ export default function CreateMeetingModal({ isOpen, onClose, onSuccess }) {
             </div>
           </div>
 
-          {/* Participant Emails */}
           <div>
             <label className="block text-xs font-extrabold uppercase tracking-wider text-black mb-1.5 flex items-center gap-1.5">
               <Users className="w-3.5 h-3.5 text-indigo-600" />
@@ -228,7 +217,6 @@ export default function CreateMeetingModal({ isOpen, onClose, onSuccess }) {
             />
           </div>
 
-          {/* Footer Actions */}
           <div className="flex items-center justify-end gap-3 pt-5 border-t border-gray-200 mt-6">
             <button
               type="button"

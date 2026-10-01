@@ -68,8 +68,6 @@ export default function Register() {
 
   return (
     <div className="relative min-h-screen overflow-hidden flex items-center justify-center px-4 pt-24 pb-10">
-
-      {/* ─── Full-page gradient background ─── */}
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
@@ -77,15 +75,12 @@ export default function Register() {
         }}
       />
 
-      {/* Ambient orbs */}
       <div className="absolute top-10 left-10 w-72 h-72 bg-emerald-500/20 rounded-full blur-3xl pointer-events-none animate-pulse" />
       <div className="absolute top-32 right-16 w-80 h-80 bg-cyan-500/15 rounded-full blur-3xl pointer-events-none" />
       <div className="absolute bottom-10 left-1/3 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
 
-      {/* ─── Navbar ─── */}
       <AuthNavbar />
 
-      {/* ─── Content ─── */}
       <div className="relative z-10 max-w-md w-full">
         <div
           className="relative overflow-hidden rounded-3xl p-8 sm:p-10 shadow-2xl border border-white/10"
@@ -94,12 +89,10 @@ export default function Register() {
             backdropFilter: 'blur(16px)',
           }}
         >
-          {/* Decorative circles */}
           <div className="absolute -top-12 -right-12 w-64 h-64 rounded-full bg-white/5 blur-2xl pointer-events-none" />
           <div className="absolute -bottom-10 -left-10 w-48 h-48 rounded-full bg-cyan-400/10 blur-xl pointer-events-none" />
 
           <div className="relative z-10">
-            {/* Logo / Badge */}
             <div className="flex flex-col items-center text-center mb-8">
               <div className="inline-flex items-center gap-3 mb-5">
                 <div

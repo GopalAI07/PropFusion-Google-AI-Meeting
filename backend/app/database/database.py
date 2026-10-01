@@ -10,6 +10,8 @@ logger = logging.getLogger(__name__)
 
 
 def _make_engine(url: str):
+    if url and url.startswith("postgres://"):
+        url = url.replace("postgres://", "postgresql://", 1)
     return create_engine(
         url,
         pool_size=settings.DATABASE_POOL_SIZE,
@@ -55,13 +57,8 @@ def _build_engine():
         raise
 
 
-# Create SQLAlchemy engine — tries the primary DB, falls back to local if it's down
 engine = _build_engine()
-
-# Session factory
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-
-# Declarative base for models
 Base = declarative_base()
 
 

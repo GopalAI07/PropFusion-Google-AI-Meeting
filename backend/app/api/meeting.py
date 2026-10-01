@@ -27,7 +27,6 @@ async def create_meeting(
     meeting_service = MeetingService(db)
     meeting = meeting_service.create_meeting(request, current_user.id)
 
-    # Send invitations to participants in background
     if meeting.participant_emails:
         for email in meeting.participant_emails:
             background_worker.run_async(

@@ -151,7 +151,6 @@ export default function MeetingRoom() {
     );
   }
 
-  // Non-host: must fill in name/email before entering the (waiting or live) room
   if (!isHost && !hasSubmittedDetails) {
     return (
       <PreCallShell>
@@ -167,7 +166,6 @@ export default function MeetingRoom() {
     );
   }
 
-  // Call is actually live — take over the whole screen
   if (meeting.status === 'in_progress') {
     return (
       <LiveCallShell>
@@ -181,7 +179,6 @@ export default function MeetingRoom() {
     );
   }
 
-  // Scheduled but not started yet — normal page, waiting for the host
   return (
     <PreCallShell>
       <StartingMeeting

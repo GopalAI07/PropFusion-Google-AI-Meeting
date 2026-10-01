@@ -1,12 +1,6 @@
 import { Link } from 'react-router-dom';
 import { Video, UserCircle2 } from 'lucide-react';
 
-/**
- * Navbar for the public Login / Register pages.
- * Mirrors the main app Navbar (same gradient bar, logo lockup, shadow/border)
- * for brand continuity, but since no one is signed in yet, the right-hand
- * "user profile" slot shows a generic placeholder instead of real account data.
- */
 export default function AuthNavbar() {
   return (
     <nav
@@ -18,8 +12,6 @@ export default function AuthNavbar() {
       }}
     >
       <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-between">
-
-        {/* Left: Brand */}
         <Link to="/login" className="group flex items-center gap-3">
           <div
             className="relative flex items-center justify-center w-10 h-10 rounded-2xl shadow-lg group-hover:scale-105 transition-transform duration-300"
@@ -44,7 +36,6 @@ export default function AuthNavbar() {
           </div>
         </Link>
 
-        {/* Right: User profile placeholder (not signed in yet) */}
         <div className="flex items-center gap-2.5 px-3 py-1.5 rounded-2xl border border-white/20 bg-white/10 backdrop-blur">
           <div
             className="w-8 h-8 rounded-xl flex items-center justify-center shadow-md ring-2 ring-white/20"

@@ -48,11 +48,9 @@ class EmailService:
             msg["From"] = self.email_from
             msg["To"] = ", ".join(to_emails)
 
-            # Plain text version
             if text_content:
                 msg.attach(MIMEText(text_content, "plain"))
 
-            # HTML version
             msg.attach(MIMEText(html_content, "html"))
 
             server = self._create_connection()

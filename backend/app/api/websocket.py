@@ -50,7 +50,6 @@ async def websocket_endpoint(
     - host_moderate: Host-only — mute/unmute a participant's mic or camera,
       or remove them from the meeting entirely.
     """
-    # Authenticate user via token
     try:
         payload = AuthService.decode_token(token)
         authenticated_user_id = payload.get("sub")
@@ -61,22 +60,18 @@ async def websocket_endpoint(
         await websocket.close(code=4001, reason="Authentication failed")
         return
 
-    # Use provided user_id or fallback to authenticated user
     active_user_id = user_id or authenticated_user_id
 
-    # A host may have removed this user earlier in the session — keep them out
     if manager.is_blocked(room_id, active_user_id):
         await websocket.close(code=4003, reason="You have been removed from this meeting")
         return
 
-    # Connect to room
     connected = await manager.connect(websocket, room_id, active_user_id, is_host=is_host)
     if not connected:
         return
 
     try:
         while True:
-            # Receive message
             data = await websocket.receive_text()
 
             try:
@@ -92,7 +87,6 @@ async def websocket_endpoint(
                 )
                 continue
 
-            # Handle the message
             await manager.handle_message(websocket, room_id, active_user_id, message_data)
 
     except WebSocketDisconnect:

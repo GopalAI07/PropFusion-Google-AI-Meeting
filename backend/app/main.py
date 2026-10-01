@@ -50,7 +50,6 @@ async def lifespan(app: FastAPI):
     engine.dispose()
 
 
-# Create FastAPI application
 app = FastAPI(
     title=settings.APP_NAME,
     version=settings.APP_VERSION,
@@ -60,9 +59,6 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-# ===================== Middleware =====================
-
-# CORS middleware
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.CORS_ORIGINS,
@@ -71,7 +67,6 @@ app.add_middleware(
     allow_headers=settings.CORS_ALLOW_HEADERS,
 )
 
-# Custom middleware
 app.add_middleware(LoggingMiddleware)
 if settings.RATE_LIMIT_ENABLED:
     app.add_middleware(RateLimitMiddleware)
@@ -79,11 +74,8 @@ app.add_middleware(ProcessTimeMiddleware)
 app.add_middleware(SecurityHeadersMiddleware)
 
 
-# ===================== Root Endpoint =====================
-
 @app.get("/", tags=["Health"])
 async def root():
-    """Root endpoint - API health check."""
     return {
         "app": settings.APP_NAME,
         "version": settings.APP_VERSION,
@@ -94,7 +86,6 @@ async def root():
 
 @app.get("/health", tags=["Health"])
 async def health_check():
-    """Health check endpoint for monitoring."""
     return {
         "status": "healthy",
         "version": settings.APP_VERSION,
@@ -102,29 +93,21 @@ async def health_check():
     }
 
 
-# ===================== Include Routers =====================
-
 app.include_router(auth_router)
 app.include_router(meeting_router)
 app.include_router(summary_router)
 app.include_router(websocket_router)
 
 
-# ===================== Static Files =====================
-
 import os
 
-# Create uploads directory if it doesn't exist
 os.makedirs(settings.UPLOAD_DIR, exist_ok=True)
 
-# Mount static files for uploaded content
 try:
     app.mount("/uploads", StaticFiles(directory=settings.UPLOAD_DIR), name="uploads")
 except Exception as e:
     logger.warning(f"Could not mount uploads directory: {e}")
 
-
-# ===================== Exception Handlers =====================
 
 @app.exception_handler(Exception)
 async def global_exception_handler(request: Request, exc: Exception):

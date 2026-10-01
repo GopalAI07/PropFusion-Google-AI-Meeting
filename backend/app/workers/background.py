@@ -41,21 +41,18 @@ class BackgroundWorker:
                 logger.error(f"Summary {summary_id} not found")
                 return
 
-            # Update status to generating
             summary = summary_service.update_summary(summary_id, user_id, {
                 "status": SummaryStatus.GENERATING,
             })
 
             meeting = summary.meeting
 
-            # Notify via WebSocket
             await manager.broadcast_summary_update(meeting.id if meeting else summary.meeting_id, {
                 "summary_id": summary_id,
                 "status": "generating",
                 "progress": 0.3,
             })
 
-            # Generate summary using AI directly from audio file if present
             if self.ai_service and summary.audio_file_path:
                 summary_data = await asyncio.to_thread(
                     self.ai_service.generate_summary_from_audio,
@@ -69,7 +66,6 @@ class BackgroundWorker:
                     "progress": 0.7,
                 })
 
-                # Update summary with AI result
                 update_data = {
                     "status": SummaryStatus.COMPLETED,
                     "title": summary_data.get("title", meeting.title if meeting else "Meeting Summary"),
@@ -84,7 +80,6 @@ class BackgroundWorker:
                     "model_used": settings.GEMINI_MODEL,
                 }
             elif self.ai_service:
-                # No audio file attached, generate high-level meeting summary from title/description
                 summary_data = await asyncio.to_thread(
                     self.ai_service.generate_summary,
                     f"Meeting Title: {meeting.title}\nDescription: {meeting.description or 'No description'}",
@@ -104,7 +99,6 @@ class BackgroundWorker:
                     "model_used": settings.GEMINI_MODEL,
                 }
             else:
-                # No AI service configured
                 update_data = {
                     "status": SummaryStatus.COMPLETED,
                     "title": meeting.title if meeting else "Meeting Summary",
@@ -113,7 +107,6 @@ class BackgroundWorker:
 
             summary_service.update_summary(summary_id, user_id, update_data)
 
-            # Export summary.txt to uploads/{username}/meetings/{meeting_id}/summary.txt
             if meeting and meeting.user:
                 try:
                     FileExportService.save_summary_file(
@@ -125,14 +118,12 @@ class BackgroundWorker:
                 except FileExportError as e:
                     logger.error(f"Failed to export summary.txt for meeting {meeting.id}: {e}")
 
-            # Notify completion via WebSocket
             await manager.broadcast_summary_update(meeting.id if meeting else summary.meeting_id, {
                 "summary_id": summary_id,
                 "status": "completed",
                 "progress": 1.0,
             })
 
-            # Send email notification if meeting has participants
             if meeting and meeting.participant_emails:
                 for email in meeting.participant_emails:
                     try:
@@ -195,5 +186,4 @@ class BackgroundWorker:
             asyncio.run(coro)
 
 
-# Singleton instance
 background_worker = BackgroundWorker()

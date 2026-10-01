@@ -5,32 +5,21 @@ const ICE_SERVERS = [
   { urls: 'stun:stun1.l.google.com:19302' },
 ];
 
-/**
- * Handles everything needed for a live meeting room:
- * - camera/mic capture
- * - WebSocket signaling (/ws/meeting/{meetingId})
- * - a WebRTC mesh so the host and every participant can see/hear each other
- * - local mic recording, so the session audio can be uploaded for transcription
- * - live mic/camera state broadcast, so everyone's tile shows correct icons
- * - host moderation: mute/unmute a participant's mic or camera, or remove them
- */
 export default function useMeetingRoom(meetingId, currentUserId, options = {}) {
   const { onRemoved } = options;
 
   const [localStream, setLocalStream] = useState(null);
-  const [remoteStreams, setRemoteStreams] = useState({}); // { userId: MediaStream }
+  const [remoteStreams, setRemoteStreams] = useState({});
   const [micOn, setMicOn] = useState(true);
   const [camOn, setCamOn] = useState(true);
-  const [connectionState, setConnectionState] = useState('connecting'); // connecting | connected | error
+  const [connectionState, setConnectionState] = useState('connecting');
   const [mediaError, setMediaError] = useState(null);
-  // { userId: { micOn: bool, camOn: bool } } — other participants' reported state
   const [participants, setParticipants] = useState({});
-  // Host has forcibly muted/disabled this device — local toggle is locked until host unblocks
   const [micBlockedByHost, setMicBlockedByHost] = useState(false);
   const [camBlockedByHost, setCamBlockedByHost] = useState(false);
 
   const wsRef = useRef(null);
-  const peersRef = useRef({}); // { userId: RTCPeerConnection }
+  const peersRef = useRef({});
   const localStreamRef = useRef(null);
   const recorderRef = useRef(null);
   const recordedChunksRef = useRef([]);
@@ -39,11 +28,6 @@ export default function useMeetingRoom(meetingId, currentUserId, options = {}) {
 
   const buildWsUrl = useCallback(() => {
     const token = localStorage.getItem('access_token');
-
-    // If VITE_WS_BASE_URL is set (e.g. wss://your-backend.onrender.com), use it —
-    // this is required whenever the frontend and backend are on different hosts,
-    // like Vercel (frontend) + Render (backend). Falls back to same-origin
-    // (window.location.host), which works for local dev via the Vite proxy.
     const configuredBase = import.meta.env.VITE_WS_BASE_URL;
     let base;
     if (configuredBase) {
@@ -137,13 +121,11 @@ export default function useMeetingRoom(meetingId, currentUserId, options = {}) {
     let cancelled = false;
 
     async function setup() {
-      // 1. Get camera/mic
       let stream;
       try {
         stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
       } catch (err) {
         try {
-          // Fallback: audio only if camera isn't available/permitted
           stream = await navigator.mediaDevices.getUserMedia({ video: false, audio: true });
           setCamOn(false);
           camOnRef.current = false;
@@ -162,7 +144,6 @@ export default function useMeetingRoom(meetingId, currentUserId, options = {}) {
         localStreamRef.current = stream;
         setLocalStream(stream);
 
-        // Start recording the local mic audio for later transcription
         const audioTracks = stream.getAudioTracks();
         if (audioTracks.length > 0) {
           try {
@@ -179,7 +160,6 @@ export default function useMeetingRoom(meetingId, currentUserId, options = {}) {
         }
       }
 
-      // 2. Open signaling WebSocket
       const ws = new WebSocket(buildWsUrl());
       wsRef.current = ws;
 
@@ -202,7 +182,6 @@ export default function useMeetingRoom(meetingId, currentUserId, options = {}) {
         const { type, data } = msg;
 
         if (type === 'room_users') {
-          // I'm the newcomer — call everyone already in the room
           (data.users || []).forEach((peerUserId) => {
             if (peerUserId !== currentUserId) initiateCallTo(peerUserId);
           });
@@ -227,7 +206,6 @@ export default function useMeetingRoom(meetingId, currentUserId, options = {}) {
         } else if (type === 'user_left' && data.user_id) {
           closePeer(data.user_id);
         } else if (type === 'user_joined' && data.user_id) {
-          // Let the newcomer know our current mic/cam state right away
           broadcastOwnState();
         } else if (type === 'participant_state' && data.user_id) {
           setParticipants((prev) => ({
@@ -303,7 +281,7 @@ export default function useMeetingRoom(meetingId, currentUserId, options = {}) {
   const toggleCamera = useCallback(() => {
     if (!localStreamRef.current || camBlockedByHost) return;
     const tracks = localStreamRef.current.getVideoTracks();
-    if (tracks.length === 0) return; // no camera available
+    if (tracks.length === 0) return;
     const newState = !camOnRef.current;
     tracks.forEach((t) => (t.enabled = newState));
     camOnRef.current = newState;
@@ -311,12 +289,10 @@ export default function useMeetingRoom(meetingId, currentUserId, options = {}) {
     broadcastOwnState();
   }, [camBlockedByHost, broadcastOwnState]);
 
-  /** Host-only: mute/unmute or remove a participant. No-op if not sent by the host (server enforces this too). */
   const hostModerate = useCallback((targetUserId, action) => {
     sendSignal('host_moderate', { target_user_id: targetUserId, action });
   }, [sendSignal]);
 
-  /** Stop recording and return the captured audio as a File, ready to upload. */
   const stopRecordingAndGetFile = useCallback(() => {
     return new Promise((resolve) => {
       const recorder = recorderRef.current;

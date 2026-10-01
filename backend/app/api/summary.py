@@ -22,7 +22,6 @@ async def generate_summary(
     summary_service = SummaryService(db)
     summary = summary_service.create_summary(meeting_id=meeting_id, user_id=current_user.id)
 
-    # Trigger background AI summary generation
     background_worker.run_async(
         background_worker.generate_summary_background(summary.id, current_user.id)
     )

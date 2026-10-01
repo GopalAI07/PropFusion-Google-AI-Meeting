@@ -24,8 +24,6 @@ async def register(request: RegisterRequest, db: Session = Depends(get_db)):
         full_name=request.full_name,
     )
 
-    # Auto-login: issue tokens so the frontend can store credentials and
-    # redirect to /dashboard immediately after registration.
     access_token = auth_service.create_access_token({"sub": user.id, "role": user.role.value})
     refresh_token = auth_service.create_refresh_token({"sub": user.id})
 

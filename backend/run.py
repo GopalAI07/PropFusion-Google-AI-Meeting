@@ -12,10 +12,7 @@ from app.config.settings import settings
 
 
 def main():
-    """Run the FastAPI application using uvicorn."""
     host = "0.0.0.0"
-    # Render (and most hosts) assign the port dynamically via $PORT — bind to
-    # that when it's set, and fall back to 8000 for local development.
     port = int(os.environ.get("PORT", 8000))
     reload_enabled = settings.DEBUG
 

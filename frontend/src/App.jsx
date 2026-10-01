@@ -12,7 +12,6 @@ import MeetingDetail from './pages/MeetingDetail';
 import MeetingRoom from './pages/MeetingRoom';
 import NotFound from './pages/NotFound';
 
-// Protected route wrapper
 function ProtectedRoute({ children }) {
   const { isAuthenticated, loading } = useAuth();
 
@@ -31,7 +30,6 @@ function ProtectedRoute({ children }) {
   return children;
 }
 
-// Public route wrapper (redirects to dashboard if already authenticated)
 function PublicRoute({ children }) {
   const { isAuthenticated, loading } = useAuth();
 
@@ -50,7 +48,6 @@ function PublicRoute({ children }) {
   return children;
 }
 
-// Main layout with Navbar and Sidebar
 function MainLayout({ children }) {
   const dispatch = useDispatch();
   const sidebarOpen = useSelector(selectSidebarOpen);
@@ -72,7 +69,6 @@ export default function App() {
   return (
     <Router>
       <Routes>
-        {/* Public Routes */}
         <Route
           path="/login"
           element={
@@ -90,7 +86,6 @@ export default function App() {
           }
         />
 
-        {/* Protected Routes */}
         <Route
           path="/dashboard"
           element={
@@ -130,10 +125,8 @@ export default function App() {
           }
         />
 
-        {/* Root redirect */}
         <Route path="/" element={<Navigate to="/dashboard" replace />} />
 
-        {/* 404 */}
         <Route path="*" element={<NotFound />} />
       </Routes>
     </Router>

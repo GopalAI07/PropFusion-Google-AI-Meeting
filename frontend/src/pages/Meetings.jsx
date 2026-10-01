@@ -50,13 +50,10 @@ export default function Meetings() {
     fetchMeetings(1);
   };
 
-  // Matches backend MeetingStatus enum: scheduled, in_progress, completed, cancelled, paused
   const statuses = ['all', 'scheduled', 'completed', 'cancelled', 'paused'];
 
   return (
     <div className="relative min-h-[calc(100vh-4rem)] overflow-hidden">
-
-      {/* ─── Full-page gradient background ─── */}
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
@@ -64,15 +61,11 @@ export default function Meetings() {
         }}
       />
 
-      {/* Ambient orbs */}
       <div className="absolute top-10 left-10 w-72 h-72 bg-indigo-600/20 rounded-full blur-3xl pointer-events-none animate-pulse" />
       <div className="absolute top-32 right-16 w-80 h-80 bg-purple-600/15 rounded-full blur-3xl pointer-events-none" />
       <div className="absolute bottom-10 left-1/3 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
 
-      {/* ─── Content ─── */}
       <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 py-10 space-y-8">
-
-        {/* Header */}
         <div>
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 border border-white/20 text-xs font-bold text-amber-300 uppercase tracking-wider mb-3">
             <Sparkles className="w-3.5 h-3.5 text-amber-300 fill-amber-300" />
@@ -84,7 +77,6 @@ export default function Meetings() {
           </p>
         </div>
 
-        {/* Filters */}
         <div
           className="rounded-3xl p-5 border border-white/10 shadow-xl"
           style={{ background: 'rgba(255,255,255,0.05)', backdropFilter: 'blur(14px)' }}
@@ -126,7 +118,6 @@ export default function Meetings() {
           </div>
         </div>
 
-        {/* Meetings List */}
         {loading ? (
           <div className="flex items-center justify-center py-24">
             <Loader2 className="w-8 h-8 animate-spin text-indigo-300" />
@@ -225,7 +216,6 @@ export default function Meetings() {
               ))}
             </div>
 
-            {/* Pagination */}
             {pagination.totalPages > 1 && (
               <div className="px-6 py-4 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-3">
                 <p className="text-sm text-indigo-200/60">

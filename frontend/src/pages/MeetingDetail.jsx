@@ -47,7 +47,6 @@ function CopyChip({ label, value }) {
       setCopied(true);
       setTimeout(() => setCopied(false), 1500);
     } catch {
-      // clipboard not available — ignore silently
     }
   };
 
@@ -239,7 +238,6 @@ export default function MeetingDetail() {
 
   return (
     <PageShell>
-      {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div className="flex items-center gap-4">
           <button
@@ -291,7 +289,6 @@ export default function MeetingDetail() {
         </div>
       )}
 
-      {/* Meeting Info Card */}
       <div className="rounded-3xl border border-white/10 shadow-xl p-6 sm:p-8" style={GLASS}>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {infoItems.map((item) => (
@@ -329,7 +326,6 @@ export default function MeetingDetail() {
         )}
       </div>
 
-      {/* Tabs */}
       <div className="rounded-2xl border border-white/10 p-1.5 inline-flex gap-1 shadow-xl" style={GLASS}>
         {tabs.map((tab) => (
           <button
@@ -354,7 +350,6 @@ export default function MeetingDetail() {
         </p>
       )}
 
-      {/* Tab Content */}
       <div className="rounded-3xl border border-white/10 shadow-xl p-6 sm:p-8" style={GLASS}>
         {activeTab === 'details' && (
           <div className="space-y-4">

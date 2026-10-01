@@ -9,7 +9,6 @@ const api = axios.create({
   },
 });
 
-// Request interceptor to add auth token
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('access_token');
@@ -21,7 +20,6 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// Response interceptor for token refresh
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
@@ -61,7 +59,6 @@ api.interceptors.response.use(
 
 export default api;
 
-// API endpoints
 export const AUTH_API = {
   register: (data) => api.post('/auth/register', data),
   login: (data) => api.post('/auth/login', data),

@@ -62,7 +62,6 @@ class User(Base):
     updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False)
     last_login = Column(DateTime(timezone=True), nullable=True)
 
-    # Relationships
     meetings = relationship("Meeting", back_populates="user", cascade="all, delete-orphan")
     summaries = relationship("Summary", back_populates="user", cascade="all, delete-orphan")
 
@@ -95,7 +94,6 @@ class Meeting(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
     updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False)
 
-    # Relationships
     user = relationship("User", back_populates="meetings")
     summaries = relationship("Summary", back_populates="meeting", cascade="all, delete-orphan")
 
@@ -111,21 +109,20 @@ class Summary(Base):
     user_id = Column(String, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
     audio_file_path = Column(String(500), nullable=True)
     title = Column(String(500), nullable=True)
-    short_summary = Column(Text, nullable=True)  # Brief 2-3 sentence summary
-    detailed_summary = Column(Text, nullable=True)  # Comprehensive summary
-    key_points = Column(JSON, default=list, nullable=True)  # List of key takeaways
-    action_items = Column(JSON, default=list, nullable=True)  # Action items with assignees
-    decisions = Column(JSON, default=list, nullable=True)  # Decisions made
-    topics = Column(JSON, default=list, nullable=True)  # Topics discussed
-    sentiment_analysis = Column(JSON, default=dict, nullable=True)  # Overall sentiment
-    next_steps = Column(JSON, default=list, nullable=True)  # Follow-up actions
+    short_summary = Column(Text, nullable=True)
+    detailed_summary = Column(Text, nullable=True)
+    key_points = Column(JSON, default=list, nullable=True)
+    action_items = Column(JSON, default=list, nullable=True)
+    decisions = Column(JSON, default=list, nullable=True)
+    topics = Column(JSON, default=list, nullable=True)
+    sentiment_analysis = Column(JSON, default=dict, nullable=True)
+    next_steps = Column(JSON, default=list, nullable=True)
     status = Column(Enum(SummaryStatus), default=SummaryStatus.PENDING, nullable=False)
     model_used = Column(String(100), default="gemini-pro", nullable=True)
     error_message = Column(Text, nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
     updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False)
 
-    # Relationships
     user = relationship("User", back_populates="summaries")
     meeting = relationship("Meeting", back_populates="summaries")
 

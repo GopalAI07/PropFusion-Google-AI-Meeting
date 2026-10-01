@@ -5,26 +5,17 @@ import { Clock, Loader2, Play, AlertTriangle, X, Calendar, Users } from 'lucide-
 
 const GLASS = { background: 'rgba(255,255,255,0.06)', backdropFilter: 'blur(14px)' };
 
-/**
- * Waiting room shown while a scheduled meeting hasn't started yet.
- * Styled like Google Meet's pre-join lobby: black backdrop, white pill CTA.
- * - Host: sees a "Start Meeting" button. Starting before the scheduled time
- *   is blocked with a popup, both client-side (instant) and server-side (authoritative).
- * - Participant: sees a waiting spinner and polls until the host starts the meeting.
- */
 export default function StartingMeeting({ meeting, isHost, onStarted }) {
   const [starting, setStarting] = useState(false);
-  const [blockedPopup, setBlockedPopup] = useState(null); // string | null
+  const [blockedPopup, setBlockedPopup] = useState(null);
   const [now, setNow] = useState(new Date());
   const pollRef = useRef(null);
 
-  // Live clock so the "time remaining" ticks
   useEffect(() => {
     const t = setInterval(() => setNow(new Date()), 1000);
     return () => clearInterval(t);
   }, []);
 
-  // Poll for the host having started the meeting
   useEffect(() => {
     pollRef.current = setInterval(async () => {
       try {
@@ -36,7 +27,6 @@ export default function StartingMeeting({ meeting, isHost, onStarted }) {
           onStarted(latest);
         }
       } catch (err) {
-        // silently ignore transient poll errors
       }
     }, 4000);
     return () => clearInterval(pollRef.current);
@@ -58,7 +48,6 @@ export default function StartingMeeting({ meeting, isHost, onStarted }) {
   })();
 
   const handleHostStart = async () => {
-    // Client-side guard for instant feedback
     if (isBeforeScheduledTime) {
       setBlockedPopup(
         `You can't start this meeting yet. It's scheduled for ${formatDate(meeting.scheduled_at, {
@@ -75,7 +64,6 @@ export default function StartingMeeting({ meeting, isHost, onStarted }) {
       const updated = res.data?.data?.meeting || res.data?.meeting;
       onStarted(updated || { ...meeting, status: 'in_progress' });
     } catch (err) {
-      // Server-side restriction is authoritative — show the same popup if it fires
       const message =
         err.response?.data?.message ||
         err.response?.data?.detail ||
@@ -165,7 +153,6 @@ export default function StartingMeeting({ meeting, isHost, onStarted }) {
         </div>
       </div>
 
-      {/* Restriction popup — host tried to start before scheduled time */}
       {blockedPopup && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
           <div className="relative w-full max-w-sm bg-white rounded-3xl shadow-2xl border border-gray-200 overflow-hidden text-gray-900">

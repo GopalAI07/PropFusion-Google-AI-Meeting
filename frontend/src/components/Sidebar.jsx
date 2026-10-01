@@ -18,7 +18,6 @@ export default function Sidebar() {
 
   return (
     <>
-      {/* Mobile overlay */}
       {isOpen && (
         <div
           className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 lg:hidden"
@@ -36,13 +35,10 @@ export default function Sidebar() {
           boxShadow: '4px 0 32px rgba(99,102,241,0.15)',
         }}
       >
-        {/* Decorative glows inside sidebar */}
         <div className="absolute top-10 right-0 w-32 h-32 bg-purple-500/20 rounded-full blur-2xl pointer-events-none" />
         <div className="absolute bottom-40 left-0 w-24 h-24 bg-indigo-400/15 rounded-full blur-2xl pointer-events-none" />
 
         <div className="relative flex flex-col h-full py-6">
-
-          {/* Section label */}
           <div className="px-5 mb-4 flex items-center gap-2">
             <Zap className="w-3 h-3 text-indigo-300" />
             <span className="text-[10px] font-extrabold text-indigo-300 uppercase tracking-[0.18em]">
@@ -51,7 +47,6 @@ export default function Sidebar() {
             <div className="flex-1 h-px bg-indigo-500/30" />
           </div>
 
-          {/* Nav links */}
           <nav className="flex-1 px-3 space-y-2">
             {navItems.map((item) => (
               <NavLink
@@ -68,7 +63,6 @@ export default function Sidebar() {
               >
                 {({ isActive }) => (
                   <>
-                    {/* Active left bar */}
                     {isActive && (
                       <span className="absolute left-0 top-2 bottom-2 w-1 rounded-r-full bg-gradient-to-b from-indigo-300 to-purple-300" />
                     )}
@@ -87,7 +81,6 @@ export default function Sidebar() {
             ))}
           </nav>
 
-          {/* AI Banner card at bottom */}
           <div className="px-4 mt-auto">
             <div
               className="p-4 rounded-2xl relative overflow-hidden border border-amber-400/25 shadow-xl"

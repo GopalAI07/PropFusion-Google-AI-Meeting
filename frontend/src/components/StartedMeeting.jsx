@@ -36,10 +36,6 @@ function VideoTile({ stream, label, muted, isLocal, cameraOff, micOff }) {
   const level = useAudioLevel(stream);
   const speaking = !micOff && level > SPEAKING_THRESHOLD;
 
-  // Keep the <video> element permanently mounted and just point/unpoint its
-  // srcObject — swapping it in/out of the tree (conditional render) was the
-  // cause of the camera not reappearing after being turned back on, since a
-  // freshly-mounted <video> node never got the stream reattached.
   useEffect(() => {
     if (videoRef.current) {
       videoRef.current.srcObject = stream || null;
@@ -104,7 +100,6 @@ function ParticipantsPanel({
       </div>
 
       <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar divide-y divide-white/5">
-        {/* Self row */}
         <div className="flex items-center gap-3 px-4 py-3">
           <div
             className="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold shrink-0"
@@ -133,7 +128,6 @@ function ParticipantsPanel({
           </span>
         </div>
 
-        {/* Everyone else */}
         {remoteUserIds.map((peerId) => {
           const label = getParticipantLabel(peerId, meeting);
           const state = participants[peerId] || { micOn: true, camOn: true };
@@ -240,7 +234,7 @@ export default function StartedMeeting({ meeting, isHost, currentUser, onEnded }
   const navigate = useNavigate();
   const [elapsedSec, setElapsedSec] = useState(0);
   const [ending, setEnding] = useState(false);
-  const [endStage, setEndStage] = useState(''); // '' | 'uploading' | 'done'
+  const [endStage, setEndStage] = useState('');
   const [openMenuId, setOpenMenuId] = useState(null);
   const [removedReason, setRemovedReason] = useState(null);
   const [showParticipants, setShowParticipants] = useState(true);
@@ -285,8 +279,6 @@ export default function StartedMeeting({ meeting, isHost, currentUser, onEnded }
     if (!window.confirm('End this meeting for everyone?')) return;
     try {
       setEnding(true);
-
-      // Stop the local recording and upload it so Gemini can generate the AI meeting summary directly
       setEndStage('uploading');
       const audioFile = await stopRecordingAndGetFile();
       if (audioFile) {
@@ -337,7 +329,6 @@ export default function StartedMeeting({ meeting, isHost, currentUser, onEnded }
 
   return (
     <div className="flex flex-col h-full min-h-0 w-full max-w-[1900px] mx-auto">
-      {/* Status strip */}
       <div className="flex items-center justify-between gap-4 px-1 pb-3 shrink-0">
         <div className="flex items-center gap-2.5 min-w-0">
           <span className="relative flex h-2.5 w-2.5 shrink-0">
@@ -375,14 +366,7 @@ export default function StartedMeeting({ meeting, isHost, currentUser, onEnded }
         </div>
       )}
 
-      {/* Stage + participants panel */}
       <div className="flex-1 min-h-0 flex gap-3">
-        {/*
-          Video stage: a single row that scrolls HORIZONTALLY as participants
-          join, rather than wrapping into more rows (which caused the page to
-          need vertical scrolling). Each tile's height fills the available
-          space and its width follows from a 16:9 aspect ratio.
-        */}
         <div className="flex-1 min-w-0 overflow-x-auto overflow-y-hidden custom-scrollbar">
           <div className="flex h-full gap-3 items-stretch pb-1">
             <div className="relative h-full">
@@ -438,7 +422,6 @@ export default function StartedMeeting({ meeting, isHost, currentUser, onEnded }
         )}
       </div>
 
-      {/* Floating control bar */}
       <div className="flex items-center justify-center pt-4 pb-1 shrink-0">
         <div className="inline-flex items-center gap-3 px-4 py-3 rounded-full bg-[#1c1c1e]/95 border border-white/10 shadow-2xl backdrop-blur-md">
           <button
