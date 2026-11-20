@@ -31,7 +31,7 @@ class PaginatedResponse(BaseModel):
 
 class LoginRequest(BaseModel):
     email: str
-    password: str = Field(..., min_length=6)
+    password: str
 
 
 class RegisterRequest(BaseModel):

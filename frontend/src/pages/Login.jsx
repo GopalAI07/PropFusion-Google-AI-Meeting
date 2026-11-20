@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { LogIn, Mail, Lock, Eye, EyeOff, Sparkles, Video } from 'lucide-react';
+import { LogIn, Mail, Lock, Eye, EyeOff, Sparkles, Video, X, UserX, ShieldAlert, ServerOff, AlertCircle } from 'lucide-react';
 import AuthNavbar from '../components/AuthNavbar';
 
 export default function Login() {
@@ -10,8 +11,76 @@ export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [localError, setLocalError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errorModal, setErrorModal] = useState({
+    isOpen: false,
+    type: '', // 'user_not_found' | 'password_incorrect' | 'server_error' | 'validation_error' | 'general'
+    title: '',
+    message: '',
+  });
+
   const { login, error: authError, clearError } = useAuth();
   const navigate = useNavigate();
+
+  // Watch authError from AuthContext as a safeguard
+  useEffect(() => {
+    if (authError && !errorModal.isOpen) {
+      const errorStr = typeof authError === 'string' ? authError : String(authError);
+      const lower = errorStr.toLowerCase();
+      let type = 'general';
+      let title = 'Authentication Error';
+      let message = errorStr;
+
+      if (lower.includes('user not found') || lower.includes('no account') || lower.includes('404')) {
+        type = 'user_not_found';
+        title = 'User Not Found';
+        message = 'We could not find an account associated with this email address. Please check your email or sign up for a new account.';
+      } else if (lower.includes('password') || lower.includes('invalid email or password') || lower.includes('401')) {
+        type = 'password_incorrect';
+        title = 'Incorrect Password';
+        message = 'The password you entered is incorrect. Please check your password and try again, or reset it.';
+      } else if (lower.includes('server') || lower.includes('network') || lower.includes('connect') || lower.includes('500')) {
+        type = 'server_error';
+        title = 'Server Error';
+        message = 'Unable to connect to the authentication server or an internal server error occurred. Please try again later.';
+      } else {
+        title = 'Login Error';
+      }
+
+      setErrorModal({
+        isOpen: true,
+        type,
+        title,
+        message,
+      });
+    }
+  }, [authError]);
+
+  // Close modal on Escape key press
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape' && errorModal.isOpen) {
+        handleCloseModal();
+      }
+    };
+    if (errorModal.isOpen) {
+      window.addEventListener('keydown', handleKeyDown);
+    }
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [errorModal.isOpen]);
+
+  const handleCloseModal = () => {
+    setErrorModal({
+      isOpen: false,
+      type: '',
+      title: '',
+      message: '',
+    });
+    setLocalError('');
+    clearError();
+    navigate('/login');
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -19,11 +88,21 @@ export default function Login() {
     clearError();
 
     if (!email.trim()) {
-      setLocalError('Email is required');
+      setErrorModal({
+        isOpen: true,
+        type: 'validation_error',
+        title: 'Email Required',
+        message: 'Please enter your email address to sign in.',
+      });
       return;
     }
     if (!password.trim()) {
-      setLocalError('Password is required');
+      setErrorModal({
+        isOpen: true,
+        type: 'validation_error',
+        title: 'Password Required',
+        message: 'Please enter your password to sign in.',
+      });
       return;
     }
 
@@ -32,13 +111,187 @@ export default function Login() {
       await login(email, password);
       navigate('/dashboard');
     } catch (err) {
-      setLocalError(err.message);
+      console.warn('Login caught error:', err);
+      const msg = typeof err?.message === 'string' ? err.message : String(err?.message || 'Login failed');
+      let type = err?.errorType || 'general';
+
+      const lower = msg.toLowerCase();
+      if (type === 'general' || type === 'auth_error' || !type) {
+        if (lower.includes('user not found') || lower.includes('no account') || err?.status === 404) {
+          type = 'user_not_found';
+        } else if (
+          lower.includes('password') ||
+          lower.includes('invalid email or password') ||
+          lower.includes('invalid credentials') ||
+          lower.includes('unauthorized') ||
+          err?.status === 401
+        ) {
+          type = 'password_incorrect';
+        } else if (
+          lower.includes('server') ||
+          lower.includes('network') ||
+          lower.includes('connect') ||
+          (err?.status && err.status >= 500)
+        ) {
+          type = 'server_error';
+        } else if (err?.status === 422) {
+          type = 'validation_error';
+        }
+      }
+
+      let title = 'Authentication Error';
+      let message = msg;
+
+      if (type === 'user_not_found') {
+        title = 'User Not Found';
+        message = 'We could not find an account associated with this email address. Please check your email or sign up for a new account.';
+      } else if (type === 'password_incorrect') {
+        title = 'Incorrect Password';
+        message = 'The password you entered is incorrect. Please check your password and try again, or reset it.';
+      } else if (type === 'server_error') {
+        title = 'Server Error';
+        message = 'Unable to connect to the authentication server or an internal server error occurred. Please try again later.';
+      } else if (type === 'validation_error') {
+        title = 'Validation Error';
+        message = msg || 'Please check your input and try again.';
+      }
+
+      setErrorModal({
+        isOpen: true,
+        type,
+        title,
+        message,
+      });
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  const displayError = localError || authError;
+  const displayError = localError;
+
+  // Render popup modal into document.body using portal for guaranteed topmost rendering
+  const renderErrorModal = () => {
+    if (!errorModal.isOpen) return null;
+
+    const modalContent = (
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="modal-error-title"
+        className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md transition-all duration-200"
+        onClick={handleCloseModal}
+      >
+        <div
+          className="relative w-full max-w-md overflow-hidden rounded-3xl p-6 sm:p-8 shadow-2xl border border-white/20 text-white"
+          style={{
+            background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.98) 0%, rgba(20, 35, 55, 0.98) 100%)',
+            backdropFilter: 'blur(24px)',
+            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.7), 0 0 40px rgba(6, 95, 70, 0.2)',
+          }}
+          onClick={(e) => e.stopPropagation()}
+        >
+          {/* Background ambient decorative glow depending on error type */}
+          <div
+            className={`absolute -top-16 -right-16 w-48 h-48 rounded-full blur-3xl pointer-events-none ${
+              errorModal.type === 'user_not_found'
+                ? 'bg-amber-500/25'
+                : errorModal.type === 'password_incorrect'
+                ? 'bg-rose-500/30'
+                : 'bg-red-500/30'
+            }`}
+          />
+          <div
+            className={`absolute -bottom-16 -left-16 w-48 h-48 rounded-full blur-3xl pointer-events-none ${
+              errorModal.type === 'user_not_found'
+                ? 'bg-cyan-500/20'
+                : errorModal.type === 'password_incorrect'
+                ? 'bg-orange-500/20'
+                : 'bg-rose-500/25'
+            }`}
+          />
+
+          {/* X cross close button (Red background, white font/icon) */}
+          <button
+            type="button"
+            onClick={handleCloseModal}
+            className="absolute top-4 right-4 w-9 h-9 flex items-center justify-center rounded-xl bg-red-600 hover:bg-red-700 text-white shadow-lg shadow-red-600/30 border border-red-400/30 transition-all hover:scale-105 active:scale-95 cursor-pointer z-20"
+            style={{ backgroundColor: '#dc2626', color: '#ffffff' }}
+            aria-label="Close"
+          >
+            <X className="w-5 h-5 text-white stroke-[2.5]" />
+          </button>
+
+          {/* Modal Content */}
+          <div className="relative z-10 flex flex-col items-center text-center">
+            {/* Error Icon */}
+            <div
+              className={`w-16 h-16 rounded-2xl flex items-center justify-center mb-5 border shadow-xl ${
+                errorModal.type === 'user_not_found'
+                  ? 'bg-amber-500/15 border-amber-500/30 text-amber-400 shadow-amber-500/10'
+                  : errorModal.type === 'password_incorrect'
+                  ? 'bg-rose-500/15 border-rose-500/30 text-rose-400 shadow-rose-500/10'
+                  : errorModal.type === 'validation_error'
+                  ? 'bg-cyan-500/15 border-cyan-500/30 text-cyan-400 shadow-cyan-500/10'
+                  : 'bg-red-500/15 border-red-500/30 text-red-400 shadow-red-500/10'
+              }`}
+            >
+              {errorModal.type === 'user_not_found' ? (
+                <UserX className="w-8 h-8" />
+              ) : errorModal.type === 'password_incorrect' ? (
+                <ShieldAlert className="w-8 h-8" />
+              ) : errorModal.type === 'validation_error' ? (
+                <AlertCircle className="w-8 h-8" />
+              ) : (
+                <ServerOff className="w-8 h-8" />
+              )}
+            </div>
+
+            {/* Title */}
+            <h3
+              id="modal-error-title"
+              className="text-2xl font-black tracking-tight text-white mb-2.5"
+            >
+              {errorModal.title}
+            </h3>
+
+            {/* Message */}
+            <p className="text-sm text-slate-300 leading-relaxed max-w-sm mb-6">
+              {errorModal.message}
+            </p>
+
+            {/* Contextual Action Links (No Close Button) */}
+            {(errorModal.type === 'user_not_found' || errorModal.type === 'password_incorrect') && (
+              <div className="w-full">
+                {errorModal.type === 'user_not_found' && (
+                  <Link
+                    to="/register"
+                    onClick={handleCloseModal}
+                    className="block w-full py-3 px-4 rounded-xl text-center font-bold text-sm bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 hover:bg-emerald-500/30 transition-all"
+                  >
+                    Create Account
+                  </Link>
+                )}
+                {errorModal.type === 'password_incorrect' && (
+                  <Link
+                    to="/forgot-password"
+                    onClick={handleCloseModal}
+                    className="block w-full py-3 px-4 rounded-xl text-center font-bold text-sm bg-cyan-500/20 text-cyan-300 border border-cyan-400/30 hover:bg-cyan-500/30 transition-all"
+                  >
+                    Forgot Password?
+                  </Link>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+
+    if (typeof document !== 'undefined' && document.body) {
+      return createPortal(modalContent, document.body);
+    }
+    return modalContent;
+  };
 
   return (
     <div className="relative min-h-screen overflow-hidden flex items-center justify-center px-4 pt-24 pb-10">
@@ -54,6 +307,9 @@ export default function Login() {
       <div className="absolute bottom-10 left-1/3 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
 
       <AuthNavbar />
+
+      {/* Pop div / Error Modal for user not found, password incorrect, or server error */}
+      {renderErrorModal()}
 
       <div className="relative z-10 max-w-md w-full">
         <div
